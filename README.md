@@ -4,4 +4,4 @@ A recipe search program that uses Python to find and print recipes according to 
 
 _Sign up at [Edamam API](https://developer.edamam.com/edamam-recipe-api) for app id and key._
 
-This project was presented alongside [ioanatovirnac](https://github.com/ioanatovirnac) as part of our final group project for the Code First Girls 8-week Introduction to Python Programming course.
+This project was presented alongside [ioanatovirnac](https://github.com/ioanatovirnac) and [CamilleBarbit](https://github.com/camillebarbit) as part of our final group project for the Code First Girls 8-week Introduction to Python Programming course.
