@@ -5,94 +5,90 @@ import requests
 
 # sets app id and app key for API
 # sign up at https://developer.edamam.com/edamam-recipe-api for id and key, and insert here
-app_id = ''
-app_key = ''
+app_id = ""
+app_key = ""
 
 # sets out example input that will be accepted in the recipe selection criteria below
-example_cuisineReq = ['American', 'British', 'French', ' Middle Eastern', 'Chinese', 'Mexican', 'Caribbean', 'Indian', 'Italian', 'Japanese', 'Mediterranean']
-example_dietReq = ['alcohol-free', 'sugar-conscious', 'gluten-free', 'wheat-free', 'vegetarian', 'vegan']
-example_dietRegime = ['balanced', 'high-fiber', 'high-protein', 'low-carb', 'low-fat', 'low-sodium']
+example_cuisineReq = ["British", "Italian", "Mexican", "Indian", "Chinese"]
+example_dietReq = ["vegetarian", "vegan", "alcohol-free", "gluten-free"]
 
 # defines variables to be used for including API parameters
-includeAppId = 'app_id={}'.format(app_id)
-includeAppKey = 'app_key={}'.format(app_key)
-includeCuisineReq = ''
-includeDietReq = ''
-includeDietRegime = ''
+includeAppId = "app_id={}".format(app_id)
+includeAppKey = "app_key={}".format(app_key)
+includeCuisineReq = ""
+includeDietReq = ""
 
 # asks user to enter ingredient(s)
-ingredient = input('Enter one or more ingredients you want to use: ')
-# uses split and join functions to enable selection of more than one ingredient
+ingredient = input("Enter one or more ingredients you want to use: ")
+while ingredient == "":
+    ingredient = input("You must enter at least one or more ingredients. Try again: ")
+# use split and join functions to enable selection of more than one ingredient
 components = ingredient.split()
-items = ',+'.join(components) or 'and+'.join(components) or ' +'.join(components)
-ingredients = 'ingredients=' + items
-includeIngredients = 'q={}'.format(ingredients)
+items = ",+".join(components) or "and+".join(components) or " +".join(components)
+ingredients = "ingredients=" + items
+includeIngredients = "q={}".format(ingredients)
+# test
+# print(ingredients)
 
 # asks user to enter cuisine preference (if any)
-print('Here are the cuisine options: ' + str(example_cuisineReq))
-cuisineReq_ask = input('Do you have a preferred cuisine? Y/N: ')
-if cuisineReq_ask == 'Y' or cuisineReq_ask == 'y':
-    cuisineReq = input('What is your preferred cuisine? (type exactly as shown) ')
+# (https://stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response)
+cuisineReq = input(f"Choose your preferred cuisine from the following options, or type 'N' if none...\n{example_cuisineReq}: ")
+while (cuisineReq != "N" and cuisineReq != "n") and (cuisineReq not in example_cuisineReq):
+    cuisineReq = input(
+        f"Invalid response. Choose your preferred cuisine from the following, or type 'N' if none...\n{example_cuisineReq}: ")
+    cuisineReq_flag = 0
+if cuisineReq == "N" or cuisineReq == "n":
+    cuisineReq_flag = 0
+elif cuisineReq in example_cuisineReq:
     includeCuisineReq = 'cuisineType={}'.format(cuisineReq)
     cuisineReq_flag = 1
-elif cuisineReq_ask == 'N' or cuisineReq_ask == 'n':
-    cuisineReq_flag = 0
+# test
+# print(includeCuisineReq)
 
 # asks user to enter dietary requirements (if any)
-print('Dietary requirement options: ' + str(example_dietReq))
-dietReq_ask = input('Do you have a dietary requirement from the above options? Y/N: ')
-if dietReq_ask == 'Y' or dietReq_ask == 'y':
-    dietReq = input('What is your dietary requirement? (type exactly as shown) ')
+# (https://stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response)
+dietReq = input(f"Choose your dietary requirement(s) from the following options, or type 'N' if none...\n{example_dietReq}: ")
+while (dietReq != "N" and dietReq != "n") and (dietReq not in example_dietReq):
+    dietReq = input(
+        f"Invalid response. Choose your dietary requirement from the following options, or type 'N' if none...\n{example_dietReq}: ")
+    dietReq_flag = 0
+if dietReq == 'N' or dietReq == 'n':
+    dietReq_flag = 0
+elif dietReq in example_dietReq:
     includeDietReq = 'health={}'.format(dietReq)
     dietReq_flag = 1
-elif dietReq_ask == 'N' or dietReq_ask == 'n':
-    dietReq_flag = 0
+# test
+# print(includeDietReq)
 
-# ask user to enter diet regime (if any)
-print('Diet regime options: ' + str(example_dietRegime))
-dietRegime_ask = input('Do you have any specific diet regime from the above options? Y/N ')
-if dietRegime_ask == 'Y' or dietRegime_ask == 'y':
-    dietRegime = input('What is your diet regime? (type exactly as shown) ')
-    includeDietRegime = 'diet={}'.format(dietRegime)
-    dietRegime_flag = 1
-elif dietRegime_ask == 'N' or dietRegime_ask == 'n':
-    dietRegime_flag = 0
+# asks user to enter maximum calorie preference
+# (https://stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response)
+# (https://stackoverflow.com/questions/5424716/how-to-check-if-string-input-is-a-number)
+caloriesAsk = ""
+while caloriesAsk is not int:
+    try:
+        caloriesReq = int(input("Enter the maximum number of calories per person: "))
+        break
+    except ValueError:
+        print("Invalid response.")
+# # test
+# # print(caloriesReq)
 
 # pulls API parameters into the url based on user choices, and sets relevant print message for each combo
-if dietReq_flag == 1 and dietRegime_flag == 1 and cuisineReq_flag == 1:
-    url = 'https://api.edamam.com/search?{}&{}&{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietReq, includeDietRegime, includeCuisineReq)
-    recipeChoices = 'You searched for {}, {} and {} recipe options, using {} '.format(cuisineReq, dietReq, dietRegime, components)
-elif dietReq_flag == 1 and dietRegime_flag == 0 and cuisineReq_flag == 1:
+if dietReq_flag == 1 and cuisineReq_flag == 1:
     url = 'https://api.edamam.com/search?{}&{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietReq, includeCuisineReq)
     recipeChoices = 'You searched for {} and {} recipe options, using {} '.format(cuisineReq, dietReq, components)
-elif dietReq_flag == 0 and dietRegime_flag == 1 and cuisineReq_flag == 1:
-    url = 'https://api.edamam.com/search?{}&{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietRegime, includeCuisineReq)
-    recipeChoices = 'You searched for {} and {} recipe options, using {} '.format(cuisineReq, dietRegime, components)
-elif dietReq_flag == 0 and dietRegime_flag == 0 and cuisineReq_flag == 1:
+elif dietReq_flag == 0 and cuisineReq_flag == 1:
     url = 'https://api.edamam.com/search?{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeCuisineReq)
     recipeChoices = 'You searched for {} recipe options, using {} '.format(cuisineReq, components)
-elif dietReq_flag == 1 and dietRegime_flag == 1 and cuisineReq_flag == 0:
-    url = 'https://api.edamam.com/search?{}&{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietReq, includeDietRegime)
-    recipeChoices = 'You searched for {} and {} recipe options, using {} '.format(dietReq, dietRegime, components)
-elif dietReq_flag == 1 and dietRegime_flag == 0 and cuisineReq_flag == 0:
+elif dietReq_flag == 1 and cuisineReq_flag == 0:
     url = 'https://api.edamam.com/search?{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietReq)
     recipeChoices = 'You searched for {} recipe options, using {} '.format(dietReq, components)
-elif dietReq_flag == 0 and dietRegime_flag == 1 and cuisineReq_flag == 0:
-    url = 'https://api.edamam.com/search?{}&{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey, includeDietRegime)
-    recipeChoices = 'You searched for {} recipe options, using {} '.format(dietRegime, components)
-elif dietReq_flag == 0 and dietRegime_flag == 0 and cuisineReq_flag == 0:
+elif dietReq_flag == 0 and cuisineReq_flag == 0:
     url = 'https://api.edamam.com/search?{}&{}&{}'.format(includeIngredients, includeAppId, includeAppKey)
     recipeChoices = 'You searched for recipe options, using {} '.format(components)
-
-# tests whether the correct url is showing!
-print(url)
-
-# asks user if they have a maximum calorie preference
-calories_ask = input('Do you have any calorie requirements (per person)? Y/N: ')
-if calories_ask == 'Y' or calories_ask == 'y':
-    calories_requirement = int(input('Enter the maximum number of calories per person: '))
-elif calories_ask == 'N' or calories_ask == 'n':
-    calories_requirement = 100000
+# test whether the correct url is showing!
+# print(url)
+# print(recipeChoices)
 
 # requests and extracts recipes from the API, into the 'results' variable, based on user choices above
 results = requests.get(url)
@@ -100,21 +96,20 @@ data = results.json()
 results = data['hits']
 
 # Printing the results
-# prints 'You've searched for {cuisineReq}, {dietReq}, {dietRegime} recipes using {ingredient(s)}'
+# prints 'You've searched for {cuisineReq}, {dietReq} recipes, using {ingredient(s)}'
 # based on user's choices/input
 print('================================================================================')
 print(recipeChoices)
-# includes/prints calories requirement if specified by user
-if calories_ask == 'Y' or calories_ask == 'y':
-    print(f'(under {calories_requirement} calories)')
-elif calories_ask == 'N' or calories_ask == 'n':
-    pass
+# includes/prints calories preference
+print(f'(under {caloriesReq} calories)')
+
 # loops through results and adds 1 on each iteration (to count how many results found)
 count = 0
 for result in results:
     recipe = result['recipe']
-    if int((recipe['calories']) / recipe['yield']) <= calories_requirement:
+    if int((recipe['calories']) / recipe['yield']) <= caloriesReq:
         count = count + 1
+        
 # if more than 0 results found, prints 'Here are your recipes'
 if count > 0:
     print('Here are your recipes: ')
@@ -122,10 +117,11 @@ if count > 0:
 else:
     print('================================================================================')
     print('Sorry, no recipes found!')
+    
 # loops through results again, where more than 0 results found...
 for result in results:
     recipe = result['recipe']
-    if int((recipe['calories']) / recipe['yield']) <= calories_requirement and count > 0:
+    if int((recipe['calories']) / recipe['yield']) <= caloriesReq and count > 0:
         # define recipe info variables, i.e. name, web link, servings, nutrition, total time, and ingredients list
         recipeLabel = recipe['label']
         webLink = recipe['url']
